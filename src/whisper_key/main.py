@@ -164,6 +164,15 @@ def setup_whisper_engine(whisper_config, vad_manager, model_registry, log_transc
     from .whisper_engine import WhisperEngine
     backend = whisper_config.get('backend', 'faster_whisper')
 
+    if backend == 'apple':
+        from .whisper_engine_apple import WhisperEngineApple
+        return WhisperEngineApple(
+            language=whisper_config['language'],
+            task=whisper_config.get('task', 'transcribe'),
+            vad_manager=vad_manager,
+            log_transcriptions=log_transcriptions,
+        )
+
     if backend == 'whisper_cpp':
         from .whisper_engine_cpp import WhisperEngineCpp
         return WhisperEngineCpp(

@@ -13,6 +13,10 @@ whisper: # Whisper AI Model Settings
     # - faster_whisper (default): CTranslate2-based, GPU-friendly, mature
     # - whisper_cpp: opt-in via `pip install whisper-local[whispercpp]`.
     #   Better Apple Silicon perf, GGUF model format, lower memory.
+    # - apple: macOS 26+ only. Apple's on-device Dictation model (SpeechTranscriber),
+    #   no Whisper download. Needs the Swift compiler (`xcode-select --install`);
+    #   the helper builds on first run. Ignores model/device/beam_size/hotwords,
+    #   cannot translate, and uses `language` as the locale (default en-US).
     backend: faster_whisper
 
     # Model selection

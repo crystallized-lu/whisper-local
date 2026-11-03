@@ -113,7 +113,11 @@ def run_cli(seconds: int = 10) -> int:
             hotwords=[], task='transcribe', vad_manager=vad_manager,
             model_registry=registry,
         )
-        if whisper_cfg.get('backend', 'faster_whisper') == 'whisper_cpp':
+        backend = whisper_cfg.get('backend', 'faster_whisper')
+        if backend == 'apple':
+            from .whisper_engine_apple import WhisperEngineApple
+            engine = WhisperEngineApple(**engine_kwargs)
+        elif backend == 'whisper_cpp':
             from .whisper_engine_cpp import WhisperEngineCpp
             engine = WhisperEngineCpp(**engine_kwargs)
         else:

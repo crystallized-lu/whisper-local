@@ -153,7 +153,10 @@ def _test_end_to_end():
 
         from .whisper_engine import WhisperEngine
         backend = whisper_cfg.get('backend', 'faster_whisper')
-        if backend == 'whisper_cpp':
+        if backend == 'apple':
+            from .whisper_engine_apple import WhisperEngineApple
+            engine = WhisperEngineApple(language='en', vad_manager=vad_manager)
+        elif backend == 'whisper_cpp':
             from .whisper_engine_cpp import WhisperEngineCpp
             engine = WhisperEngineCpp(
                 model_key=whisper_cfg['model'], device=whisper_cfg['device'],

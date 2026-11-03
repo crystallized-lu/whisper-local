@@ -269,6 +269,20 @@ def _section_model() -> int:
             except ImportError:
                 Check("pywhispercpp installed").fail("missing — run: pip install 'whisper-local[whispercpp]'").print()
                 failures += 1
+        elif backend == 'apple':
+            import platform
+            import shutil
+            macos_major = int((platform.mac_ver()[0] or '0').split('.')[0])
+            if macos_major >= 26:
+                Check("macOS 26+ (SpeechTranscriber)").ok(platform.mac_ver()[0]).print()
+            else:
+                Check("macOS 26+ (SpeechTranscriber)").fail(f"found {platform.mac_ver()[0] or 'non-macOS'}").print()
+                failures += 1
+            if shutil.which('swiftc'):
+                Check("Swift compiler (builds apple-stt)").ok().print()
+            else:
+                Check("Swift compiler (builds apple-stt)").fail("missing — run: xcode-select --install").print()
+                failures += 1
         elif whisper_cfg.get('device') == 'cuda':
             failures += _check_gpu_libraries()
         streaming_cfg = cfg.get_streaming_config()
@@ -278,7 +292,9 @@ def _section_model() -> int:
         )
         model_key = whisper_cfg.get('model', 'tiny')
         cached = registry.is_model_cached(model_key)
-        if cached:
+        if backend == 'apple':
+            pass  # Apple manages its own model; no Whisper download happens
+        elif cached:
             Check(f"Model '{model_key}' cached").ok().print()
         else:
             Check(f"Model '{model_key}' cache").info("will download on first use").print()

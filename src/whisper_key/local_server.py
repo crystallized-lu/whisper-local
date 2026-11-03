@@ -91,7 +91,11 @@ def _build_engine():
     )
 
     backend = whisper_cfg.get('backend', 'faster_whisper')
-    if backend == 'whisper_cpp':
+    if backend == 'apple':
+        from .whisper_engine_apple import WhisperEngineApple
+        engine = WhisperEngineApple(language=whisper_cfg.get('language', 'auto'),
+                                    vad_manager=vad_manager)
+    elif backend == 'whisper_cpp':
         from .whisper_engine_cpp import WhisperEngineCpp
         engine = WhisperEngineCpp(
             model_key=whisper_cfg['model'], device=whisper_cfg['device'],

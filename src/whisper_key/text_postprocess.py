@@ -564,6 +564,11 @@ def _ollama_polish(text: str, cfg: dict) -> str:
         'prompt': final_prompt,
         'stream': False,
     }
+    # Reasoning models (lfm3, qwen3, deepseek-r1) think before answering by
+    # default, which turns a sub-second polish into 15 s+ and blows the timeout.
+    # Only sent when set: older Ollama builds and some models reject the field.
+    if cfg.get('think') is not None:
+        payload['think'] = _on(cfg.get('think'))
 
     try:
         req = urllib.request.Request(

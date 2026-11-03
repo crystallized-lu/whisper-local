@@ -374,6 +374,27 @@ class TextPostprocessTests(unittest.TestCase):
         result = _ollama_polish("hi", cfg)
         self.assertEqual(result, '')
 
+    def test_ollama_polish_sends_think_only_when_set(self):
+        # think:false keeps reasoning models fast; unset must leave the payload untouched.
+        import json
+        import unittest.mock as mock
+        from whisper_key.text_postprocess import _ollama_polish
+        sent = []
+
+        def fake_urlopen(req, timeout):
+            sent.append(json.loads(req.data))
+            reply = mock.MagicMock()
+            reply.__enter__.return_value.read.return_value = b'{"response": "Hi."}'
+            return reply
+
+        with mock.patch('urllib.request.urlopen', fake_urlopen):
+            self.assertEqual(_ollama_polish("hi", {'think': False}), "Hi.")
+            self.assertEqual(_ollama_polish("hi", {'think': 'false'}), "Hi.")
+            self.assertEqual(_ollama_polish("hi", {}), "Hi.")
+        self.assertIs(sent[0]['think'], False)
+        self.assertIs(sent[1]['think'], False)
+        self.assertNotIn('think', sent[2])
+
     # --- Post-transcription replacements (correction-learning backing store) ---
     def test_replacement_literal_whole_word(self):
         from whisper_key.text_postprocess import postprocess

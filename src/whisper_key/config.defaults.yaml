@@ -630,6 +630,10 @@ postprocess: # Transcription post-processing pipeline
         endpoint: http://localhost:11434
         model: llama3.2
         timeout: 5
+        # Reasoning models (lfm3, qwen3, deepseek-r1) "think" first by default,
+        # which can take 15 s+ and hit the timeout. false = answer directly.
+        # null = don't send the setting (for models without thinking support).
+        think: null
         prompt: |-
             Polish this dictation. Fix punctuation and capitalization only. Do not change wording or add anything. Output ONLY the polished text:
 
